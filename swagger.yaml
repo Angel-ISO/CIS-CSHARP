@@ -1,0 +1,288 @@
+openapi: 3.0.0
+info:
+  title: CIS API
+  description: API para gestionar temas, ideas y votación, integrando un sistema heredado.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor local de desarrollo
+paths:
+  /auth/login:
+    post:
+      summary: Iniciar sesión
+      description: Inicia sesión con las credenciales del usuario.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Inicio de sesión exitoso, devuelve un token JWT.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Credenciales inválidas.
+  /auth/register:
+    post:
+      summary: Registrar un nuevo usuario
+      description: Permite registrar un nuevo usuario en el sistema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                name:
+                  type: string
+                email:
+                  type: string
+                  
+      responses:
+        '201':
+          description: Usuario registrado exitosamente.
+        '400':
+          description: Datos inválidos o usuario ya existente.
+
+  /topics:
+    get:
+      summary: Obtener lista de temas
+      description: Devuelve todos los temas disponibles.
+      responses:
+        '200':
+          description: Lista de temas.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    name:
+                      type: string
+    post:
+      summary: Crear un nuevo tema
+      description: Crea un nuevo tema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: Tema creado exitosamente.
+        '401':
+          description: No autorizado (usuario no autenticado).
+
+  /topics/{id}:
+    get:
+      summary: Obtener detalles de un tema
+      description: Obtiene los detalles de un tema específico por su ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalles del tema.
+        '404':
+          description: Tema no encontrado.
+
+    put:
+      summary: Actualizar un tema
+      description: Actualiza un tema existente.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Tema actualizado exitosamente.
+        '401':
+          description: No autorizado (usuario no autenticado).
+        '404':
+          description: Tema no encontrado.
+
+    delete:
+      summary: Eliminar un tema
+      description: Elimina un tema existente.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Tema eliminado exitosamente.
+        '401':
+          description: No autorizado (usuario no autenticado).
+        '404':
+          description: Tema no encontrado.
+
+  /topics/{id}/ideas:
+    get:
+      summary: Obtener ideas de un tema
+      description: Devuelve todas las ideas asociadas a un tema específico.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lista de ideas.
+    post:
+      summary: Crear una idea en un tema
+      description: Crea una nueva idea dentro de un tema.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Idea creada exitosamente.
+        '401':
+          description: No autorizado (usuario no autenticado).
+
+  /ideas/{id}:
+    get:
+      summary: Obtener detalles de una idea
+      description: Obtiene los detalles de una idea específica por su ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detalles de la idea.
+        '404':
+          description: Idea no encontrada.
+
+    put:
+      summary: Actualizar una idea
+      description: Actualiza una idea existente.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+      responses:
+        '200':
+          description: Idea actualizada exitosamente.
+        '401':
+          description: No autorizado (usuario no autenticado).
+        '404':
+          description: Idea no encontrada.
+
+    delete:
+      summary: Eliminar una idea
+      description: Elimina una idea existente.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Idea eliminada exitosamente.
+        '401':
+          description: No autorizado (usuario no autenticado).
+        '404':
+          description: Idea no encontrada.
+
+  /ideas/{id}/vote:
+    post:
+      summary: Votar por una idea
+      description: Permite a un usuario votar por una idea específica.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Voto registrado exitosamente.
+        '401':
+          description: No autorizado (usuario no autenticado).
+        '404':
+          description: Idea no encontrada.
+
+  /ideas/{id}/unvote:
+    post:
+      summary: Quitar voto de una idea
+      description: Permite a un usuario quitar su voto de una idea específica.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Voto removido exitosamente.
+        '401':
+          description: No autorizado (usuario no autenticado).
+        '404':
+          description: Idea no encontrada.
