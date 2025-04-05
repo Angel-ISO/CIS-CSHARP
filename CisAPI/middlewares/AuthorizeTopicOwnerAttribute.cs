@@ -45,7 +45,7 @@ public class AuthorizeTopicOwnerAttribute : Attribute, IAsyncAuthorizationFilter
                 return;
             }
 
-            if (roles.Contains("ROLE_ADMIN"))
+            if (roles != null && roles.Contains("ROLE_ADMIN"))
             {
                 return; 
             }

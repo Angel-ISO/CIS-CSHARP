@@ -12,9 +12,9 @@ public class UnitOfWork : IUnitOfWork, IDisposable
 {
 
     private readonly CisContext _context;
-    private Itopic _topics;
-    private Iidea _ideas;
-    private Ivote _votes;
+    private Itopic ? _topics;
+    private Iidea ? _ideas;
+    private Ivote ? _votes;
 
 
      public UnitOfWork(CisContext context)

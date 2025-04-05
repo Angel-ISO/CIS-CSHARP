@@ -26,6 +26,9 @@ public class MappingProfiles : Profile
 
         CreateMap<CreateIdeaDto, Idea>();
 
+        CreateMap<UpdateIdeaDto, Idea>();
+
+
 
 
 

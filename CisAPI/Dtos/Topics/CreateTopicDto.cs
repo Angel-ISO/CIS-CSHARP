@@ -9,8 +9,8 @@ public class CreateTopicDto
 {
     [Required]
     [MaxLength(255)]
-    public string Title { get; set; } = string.Empty;
+    public string ? Title { get; set; }
 
     [Required]
-    public string Description { get; set; } = string.Empty;
+    public string ? Description { get; set; }
 }

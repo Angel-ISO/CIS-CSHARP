@@ -62,6 +62,8 @@ public class TopicController : BaseApiController
 public async Task<IActionResult> Post(CreateTopicDto createTopicDto)
 {
     var userId = _userContextService.GetUserId();  
+    if (string.IsNullOrEmpty(userId))
+    return BadRequest("User ID is required.");
     var username = _userContextService.GetUsername();  
 
     var topic = _mapper.Map<Topic>(createTopicDto);

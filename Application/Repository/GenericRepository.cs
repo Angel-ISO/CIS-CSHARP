@@ -30,14 +30,11 @@ namespace Application.Repository;
     {
         return await _context.Set<T>().ToListAsync();
     }
-    public virtual async Task<T> GetByIdAsync(Guid id)
+    public virtual async Task<T?> GetByIdAsync(Guid id)
     {
         return await _context.Set<T>().FindAsync(id);
     }
-    public virtual async Task<T> GetByIdAsync(string id)
-    {
-       return await _context.Set<T>().FindAsync(id);
-    }
+    
     public virtual void Remove(T entity)
     {
         _context.Set<T>().Remove(entity);

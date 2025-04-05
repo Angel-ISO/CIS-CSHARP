@@ -52,54 +52,64 @@ namespace CisAPI.Extensions;
 
 
 
-public static void AddJwt(this IServiceCollection services, IConfiguration configuration)
-{
-    services.Configure<JWT>(configuration.GetSection("JWT"));
+   public static void AddJwt(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<JWT>(configuration.GetSection("JWT"));
 
-    services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(o =>
-    {
-        o.RequireHttpsMetadata = false;
-        o.SaveToken = false;
-        o.TokenValidationParameters = new TokenValidationParameters
+        var jwtKey = configuration["JWT:Key"];
+        var jwtIssuer = configuration["JWT:Issuer"];
+
+        if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer))
+            throw new InvalidOperationException("JWT settings are not configured properly in appsettings.json.");
+
+        services.AddAuthentication(options =>
         {
-            ValidateIssuerSigningKey = true,
-            ValidateIssuer = true,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero,
-            
-            ValidIssuer = configuration["JWT:Issuer"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(configuration["JWT:Key"])
-            ),
-            
-            NameClaimType = "sub",      
-            RoleClaimType = "authorities" 
-        };
-        
-        o.Events = new JwtBearerEvents
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(o =>
         {
-            OnAuthenticationFailed = context =>
+            o.RequireHttpsMetadata = false;
+            o.SaveToken = false;
+            o.TokenValidationParameters = new TokenValidationParameters
             {
-                Console.WriteLine($"Authentication failed: {context.Exception}");
-                return Task.CompletedTask;
-            },
-            OnTokenValidated = context =>
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = true,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero,
+
+                ValidIssuer = jwtIssuer,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+
+                NameClaimType = "sub",
+                RoleClaimType = "authorities"
+            };
+
+            o.Events = new JwtBearerEvents
             {
-                Console.WriteLine("Token validated successfully");
-                foreach (var claim in context.Principal.Claims)
+                OnAuthenticationFailed = context =>
                 {
-                    Console.WriteLine($"{claim.Type}: {claim.Value}");
+                    Console.WriteLine($"Authentication failed: {context.Exception}");
+                    return Task.CompletedTask;
+                },
+                OnTokenValidated = context =>
+                {
+                    Console.WriteLine("Token validated successfully");
+
+                    var principal = context.Principal;
+                    if (principal != null)
+                    {
+                        foreach (var claim in principal.Claims)
+                        {
+                            Console.WriteLine($"{claim.Type}: {claim.Value}");
+                        }
+                    }
+
+                    return Task.CompletedTask;
                 }
-                return Task.CompletedTask;
-            }
-        };
-    });
+            };
+        });
 }
 
 

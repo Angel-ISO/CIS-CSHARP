@@ -7,5 +7,5 @@ using Domain.Entities;
 namespace Domain.Interfaces;
 public interface Iidea : IGenericRepository<Idea>
 {
-    
+    public Task<IEnumerable<Idea>> GetIdeasByTopicIdAsync(Guid topicId);
 }

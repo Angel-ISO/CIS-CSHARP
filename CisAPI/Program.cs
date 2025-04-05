@@ -57,7 +57,11 @@ builder.Services.AddAuthentication();
 
 builder.Services.AddDbContext<CisContext>(options =>
 {
-    string connectionString = builder.Configuration.GetConnectionString("ConexDb");
+    string? connectionString = builder.Configuration.GetConnectionString("ConexDb");
+
+    if (string.IsNullOrWhiteSpace(connectionString))
+        throw new InvalidOperationException("Connection string 'ConexDb' is not configured in appsettings.json.");
+
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
