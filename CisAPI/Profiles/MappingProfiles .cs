@@ -40,5 +40,8 @@ public class MappingProfiles : Profile
 
         CreateMap<CreateVoteDto, Vote>()
             .ForMember(dest => dest.VotedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
+
+        
+
     }
 }

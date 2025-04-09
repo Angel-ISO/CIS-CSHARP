@@ -23,6 +23,6 @@ public class Params
     public string Search
     {
         get => _search;
-        set => _search = string.IsNullOrEmpty(value) ? null : value.ToLower(); 
+        set => _search = string.IsNullOrEmpty(value) ? string.Empty : value.ToLower();
     }
 }
