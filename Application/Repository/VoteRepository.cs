@@ -20,8 +20,11 @@ public class VoteRepository : GenericRepository<Vote>, Ivote
     public override async Task<(int totalRegistros, IEnumerable<Vote> registros)> GetAllAsync(int pageIndex, int pageSize, string search)
     {
         var query = _context.Votes as IQueryable<Vote>;
-        if (!string.IsNullOrEmpty(search))
-            query = query.Where(p => p.IdeaId.ToString().Contains(search, StringComparison.OrdinalIgnoreCase));
+        
+         if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Idea != null && EF.Functions.Like(p.Idea.Title!, $"%{search}%"));
+            }
         var totalRegistros = await query.CountAsync();
         var registros = await query
             .Include(p => p.Idea)

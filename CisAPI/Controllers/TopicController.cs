@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using CisAPI.Dtos.Topics;
 using CisAPI.Helpers;
@@ -81,7 +77,7 @@ public async Task<IActionResult> Post(CreateTopicDto createTopicDto)
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [AuthorizeTopicOwner]
+        [AuthorizeOwner("topic")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<TopicDto>> Put(Guid id, [FromBody] UpdateTopicDto updateDto)
         {
@@ -105,7 +101,7 @@ public async Task<IActionResult> Post(CreateTopicDto createTopicDto)
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [AuthorizeTopicOwner]
+        [AuthorizeOwner("topic")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id)
         {

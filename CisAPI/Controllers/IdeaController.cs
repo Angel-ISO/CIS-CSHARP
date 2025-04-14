@@ -85,7 +85,7 @@ public class IdeaController : BaseApiController
     }
 
     [HttpPut("{id}")]
-    [AuthorizeIdeaOwner]
+    [AuthorizeOwner("idea")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -108,7 +108,7 @@ public class IdeaController : BaseApiController
     }
 
     [HttpDelete("{id}")]
-    [AuthorizeIdeaOwner]
+    [AuthorizeOwner("idea")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id)

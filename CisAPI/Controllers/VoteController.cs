@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CisAPI.Dtos.Votes;
 using CisAPI.Helpers;
+using CisAPI.middlewares;
 using CisAPI.Services;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -86,6 +87,7 @@ public class VoteController : BaseApiController
     }
 
     [HttpPut("{ideaId}")]
+    [AuthorizeOwner("vote" , "ideaId")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Put(Guid ideaId, [FromBody] UpdateVoteDto updateDto)
@@ -108,7 +110,9 @@ public class VoteController : BaseApiController
         return Ok("Vote updated.");
     }
 
+    
     [HttpDelete("{ideaId}")]
+    [AuthorizeOwner("vote", "ideaId")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid ideaId)

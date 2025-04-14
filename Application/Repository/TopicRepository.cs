@@ -21,7 +21,7 @@ public class TopicRepository  : GenericRepository<Topic>, Itopic
     {
         var query = _context.Topics as IQueryable<Topic>;
         if (!string.IsNullOrEmpty(search))
-            query = query.Where(p => p.Title != null && p.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(p => p.Title != null && p.Title.ToLower().Contains(search.ToLower()));
         var totalRegistros = await query.CountAsync();
         var registros = await query
             .Include(p => p.Ideas)
@@ -40,7 +40,6 @@ public class TopicRepository  : GenericRepository<Topic>, Itopic
         .Include(p => p.Ideas)
         .FirstOrDefaultAsync(p => p.Id == id);
 }
-
 
 
 }

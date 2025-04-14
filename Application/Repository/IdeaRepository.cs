@@ -20,10 +20,11 @@ public class IdeaRepository : GenericRepository<Idea>, Iidea
     {
         var query = _context.Ideas as IQueryable<Idea>;
         if (!string.IsNullOrEmpty(search))
-            query = query.Where(p => p.Title != null && p.Title.Contains(search, StringComparison.OrdinalIgnoreCase));
+            query = query.Where(p => p.Title != null && p.Title.ToLower().Contains(search.ToLower()));
         var totalRegistros = await query.CountAsync();
         var registros = await query
             .Include(p => p.Votes)
+            .Include(p => p.Topic)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -36,6 +37,7 @@ public class IdeaRepository : GenericRepository<Idea>, Iidea
 {
     return await _context.Ideas
         .Include(p => p.Votes)
+        .Include(p => p.Topic)
         .FirstOrDefaultAsync(p => p.Id == id);
 }
 
@@ -45,6 +47,7 @@ public async Task<IEnumerable<Idea>> GetIdeasByTopicIdAsync(Guid topicId)
     return await _context.Ideas
         .OrderByDescending(i => i.CreatedAt)
         .Include(i => i.Votes)
+        .Include(p => p.Topic)
         .Where(i => i.TopicId == topicId)
         .ToListAsync();
 }
