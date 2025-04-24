@@ -9,7 +9,7 @@ public class CreateVoteDto
 {
 
         [Required]
-        public Guid IdeaId { get; set; }
+        public string? IdeaId { get; set; }
 
         [Required]
         [Range(-1, 1)] 

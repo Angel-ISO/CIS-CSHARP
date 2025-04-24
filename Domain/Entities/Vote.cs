@@ -1,10 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 
 namespace Domain.Entities;
 public class Vote : BaseEntity
 {
-         [Required]
+        [Required]
+        [BsonRepresentation(BsonType.String)]
         public Guid UserId { get; set; }
 
 
@@ -16,7 +19,8 @@ public class Vote : BaseEntity
 
 
         [Required]
-        public Guid IdeaId { get; set; }
+        public string? IdeaId { get; set; }
 
+        [BsonIgnore]
         public virtual Idea? Idea { get; set; }
 }

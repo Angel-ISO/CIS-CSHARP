@@ -1,118 +1,75 @@
-using System.Text;
+using System.Reflection;
 using Application.UnitOfWork;
 using AspNetCoreRateLimit;
-using CisAPI.Helpers;
 using CisAPI.Services;
 using Domain.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc.Versioning;
-using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
+using Persistence;
+using Persistence.seeds;
 
 namespace CisAPI.Extensions;
     public static class ApplicationServiceExtensions
-{
-    public static void ConfigureCors(this IServiceCollection services) =>
-        services.AddCors(options =>
-        {
-            options.AddPolicy("CorsPolicy", builder =>
-                builder.AllowAnyOrigin()    //WithOrigins("https://domain.com")
-                    .AllowAnyMethod()       //WithMethods("GET","POST)
-                    .AllowAnyHeader());     //WithHeaders("accept","content-type")
-        });
-    public static void AddAplicacionServices(this IServiceCollection services)
     {
-       // services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
-        //services.AddScoped<IUserService, UserService>();
-        services.AddAutoMapper(typeof(ApplicationServiceExtensions));
+    public static void AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        // AutoMapper
+        services.AddAutoMapper(Assembly.GetEntryAssembly());
+
+
+        // Unit of Work & context-related services
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<UserContextService>();
-    }
 
+        // DB Context
+        string? connectionString = configuration.GetConnectionString("MongoDb");
+        if (string.IsNullOrWhiteSpace(connectionString))
+            throw new InvalidOperationException("Connection string 'MongoDb' is not configured in appsettings.json.");
 
-   public static void ConfigurationRatelimiting(this IServiceCollection services){
-        services.AddMemoryCache();
-        services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-        services.AddInMemoryRateLimiting();
-        services.Configure<IpRateLimitOptions>(opt =>{
-            opt.EnableEndpointRateLimiting = true;
-            opt.StackBlockedRequests = false;
-            opt.HttpStatusCode = 429;
-            opt.RealIpHeader = "X-Real-IP";
-            opt.GeneralRules = new(){
-                new(){
-                   Endpoint = "*",
-                   Period = "10s",
-                   Limit = 15
-                }
-            };
-        });
-    }
+        services.AddSingleton<IMongoClient>(sp =>
+            new MongoClient(connectionString));
+        services.AddSingleton(sp =>
+            sp.GetRequiredService<IMongoClient>().GetDatabase("Cis")); 
 
-   
+        services.AddScoped<CisContext>();
 
+            
 
+        // Seeds
+        services.AddSingleton<TopicSeed>();
+        services.AddSingleton<IdeaSeed>();
+        services.AddSingleton<VoteSeed>();
 
-   public static void AddJwt(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<JWT>(configuration.GetSection("JWT"));
-
-        var jwtKey = configuration["JWT:Key"];
-        var jwtIssuer = configuration["JWT:Issuer"];
-
-        if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer))
-            throw new InvalidOperationException("JWT settings are not configured properly in appsettings.json.");
-
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(o =>
-        {
-            o.RequireHttpsMetadata = false;
-            o.SaveToken = false;
-            o.TokenValidationParameters = new TokenValidationParameters
+        services.AddHostedService<SeedOrchestrator>();
+        }
+        public static void ConfigureCors(this IServiceCollection services) =>
+            services.AddCors(options =>
             {
-                ValidateIssuerSigningKey = true,
-                ValidateIssuer = true,
-                ValidateAudience = false,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero,
-
-                ValidIssuer = jwtIssuer,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-
-                NameClaimType = "sub",
-                RoleClaimType = "authorities"
-            };
-
-            o.Events = new JwtBearerEvents
+                options.AddPolicy("CorsPolicy", builder =>
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader());
+            });
+        public static void ConfigureRateLimiting(this IServiceCollection services)
+        {
+            services.AddMemoryCache();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            services.AddInMemoryRateLimiting();
+            services.Configure<IpRateLimitOptions>(opt =>
             {
-                OnAuthenticationFailed = context =>
+                opt.EnableEndpointRateLimiting = true;
+                opt.StackBlockedRequests = false;
+                opt.HttpStatusCode = 429;
+                opt.RealIpHeader = "X-Real-IP";
+                opt.GeneralRules = new()
                 {
-                    Console.WriteLine($"Authentication failed: {context.Exception}");
-                    return Task.CompletedTask;
-                },
-                OnTokenValidated = context =>
+                new()
                 {
-                    Console.WriteLine("Token validated successfully");
-
-                    var principal = context.Principal;
-                    if (principal != null)
-                    {
-                        foreach (var claim in principal.Claims)
-                        {
-                            Console.WriteLine($"{claim.Type}: {claim.Value}");
-                        }
-                    }
-
-                    return Task.CompletedTask;
+                    Endpoint = "*",
+                    Period = "10s",
+                    Limit = 15
                 }
-            };
-        });
-}
-
-
-
-
+                };
+            });
+        }
+    
 }

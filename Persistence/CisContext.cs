@@ -1,25 +1,21 @@
 using Domain.Entities;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
+using MongoDB.Driver;
 
 
 
 namespace Persistence;
 
-public class CisContext : DbContext
+public class CisContext 
 {
-    public CisContext(DbContextOptions options) : base(options)
-    {
-    }
+      private readonly IMongoDatabase _database;
 
-    public DbSet<Topic> Topics { get; set; }
-    public DbSet<Idea> Ideas { get; set; }
-    public DbSet<Vote> Votes { get; set; }
-
-     protected override void OnModelCreating(ModelBuilder modelBuilder)
+        public CisContext(IMongoClient mongoClient)
         {
-            base.OnModelCreating(modelBuilder);
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
+            _database = mongoClient.GetDatabase("Cis"); 
         }
+
+        public IMongoCollection<Topic> Topics => _database.GetCollection<Topic>("Topics");
+        public IMongoCollection<Idea> Ideas => _database.GetCollection<Idea>("Ideas");
+        public IMongoCollection<Vote> Votes => _database.GetCollection<Vote>("Votes");
+
 }

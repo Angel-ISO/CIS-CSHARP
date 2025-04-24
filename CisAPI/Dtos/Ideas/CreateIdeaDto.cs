@@ -15,5 +15,5 @@ public class CreateIdeaDto
     public string? Description { get; set; }
 
     [Required]
-    public Guid TopicId { get; set; }
+    public string? TopicId { get; set; }
 }

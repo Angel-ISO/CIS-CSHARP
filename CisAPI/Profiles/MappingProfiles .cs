@@ -22,7 +22,6 @@ public class MappingProfiles : Profile
         CreateMap<Idea, IdeaDto>()
             .ForMember(dest => dest.Likes, opt => opt.MapFrom(src => src.Votes.Count(v => v.Value == 1)))  
             .ForMember(dest => dest.Dislikes, opt => opt.MapFrom(src => src.Votes.Count(v => v.Value == -1)))
-            .ForMember(dest => dest.TopicTitle, opt => opt.MapFrom(src => src.Topic != null ? src.Topic.Title : null))   
             .ReverseMap();
 
         CreateMap<CreateIdeaDto, Idea>();

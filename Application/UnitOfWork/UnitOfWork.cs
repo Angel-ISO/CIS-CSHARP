@@ -10,54 +10,24 @@ namespace Application.UnitOfWork;
 
 public class UnitOfWork : IUnitOfWork, IDisposable
 {
-
     private readonly CisContext _context;
-    private Itopic ? _topics;
-    private Iidea ? _ideas;
-    private Ivote ? _votes;
+    private Itopic? _topics;
+    private Iidea? _ideas;
+    private Ivote? _votes;
 
-
-     public UnitOfWork(CisContext context)
+    public UnitOfWork(CisContext context)
     {
         _context = context;
     }
 
+    public Itopic Topics => _topics ??= new TopicRepository(_context);
+    public Iidea Ideas => _ideas ??= new IdeaRepository(_context);
+    public Ivote Votes => _votes ??= new VoteRepository(_context);
 
 
-     public Itopic Topics
-    {
-        get
-        {
-            _topics ??= new TopicRepository(_context);
-            return _topics;
-        }
-    }
-
-    public Iidea Ideas
-    {
-        get
-        {
-            _ideas ??= new IdeaRepository(_context);
-            return _ideas;
-        }
-    }
-
-    public Ivote Votes
-    {
-        get
-        {
-            _votes ??= new VoteRepository(_context);
-            return _votes;
-        }
-    }
-
-      public async Task<int> SaveAsync()
-    {
-        return await _context.SaveChangesAsync();
-    }
-
+      
     public void Dispose()
     {
-        _context.Dispose();
+        throw new NotImplementedException();
     }
 }

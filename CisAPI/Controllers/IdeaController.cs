@@ -44,7 +44,7 @@ public class IdeaController : BaseApiController
     [HttpGet("topic/{topicId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IEnumerable<IdeaDto>>> GetByTopic(Guid topicId)
+    public async Task<ActionResult<IEnumerable<IdeaDto>>> GetByTopic(string topicId)
     {
         var ideas = await _unitOfWork.Ideas.GetIdeasByTopicIdAsync(topicId);
         var ideasDto = _mapper.Map<List<IdeaDto>>(ideas);
@@ -54,7 +54,7 @@ public class IdeaController : BaseApiController
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<IdeaDto>> GetById(Guid id)
+    public async Task<ActionResult<IdeaDto>> GetById(string id)
     {
         var idea = await _unitOfWork.Ideas.GetByIdAsync(id);
         if (idea == null)
@@ -66,11 +66,11 @@ public class IdeaController : BaseApiController
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Post(CreateIdeaDto createDto)
+    public IActionResult Post(CreateIdeaDto createDto)
     {
         var userId = _userContextService.GetUserId();
         if (string.IsNullOrEmpty(userId))
-        return BadRequest("User ID is required.");
+            return BadRequest("User ID is required.");
         var username = _userContextService.GetUsername();
 
         var idea = _mapper.Map<Idea>(createDto);
@@ -79,8 +79,6 @@ public class IdeaController : BaseApiController
         idea.CreatedAt = DateTime.UtcNow;
 
         _unitOfWork.Ideas.Add(idea);
-        await _unitOfWork.SaveAsync();
-
         return CreatedAtAction(nameof(GetById), new { id = idea.Id }, new { message = "Idea created successfully" });
     }
 
@@ -89,7 +87,7 @@ public class IdeaController : BaseApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<IdeaDto>> Put(Guid id, UpdateIdeaDto updateDto)
+    public async Task<ActionResult<IdeaDto>> Put(string id, UpdateIdeaDto updateDto)
     {
         var idea = await _unitOfWork.Ideas.GetByIdAsync(id);
         if (idea == null)
@@ -102,7 +100,6 @@ public class IdeaController : BaseApiController
             idea.Description = updateDto.Description;
 
         _unitOfWork.Ideas.Update(idea);
-        await _unitOfWork.SaveAsync();
 
         return Ok(_mapper.Map<IdeaDto>(idea));
     }
@@ -111,14 +108,13 @@ public class IdeaController : BaseApiController
     [AuthorizeOwner("idea")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid id)
+    public async Task<IActionResult> Delete(string id)
     {
         var idea = await _unitOfWork.Ideas.GetByIdAsync(id);
         if (idea == null)
             return NotFound();
 
         _unitOfWork.Ideas.Remove(idea);
-        await _unitOfWork.SaveAsync();
 
         return NoContent();
     }

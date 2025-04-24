@@ -5,41 +5,70 @@ using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 using Persistence;
 
 namespace Application.Repository;
-public class TopicRepository  : GenericRepository<Topic>, Itopic
-{
-    private readonly CisContext _context;
-    public TopicRepository(CisContext context) : base(context)
-    {
-        _context = context;
-    }
 
+
+public class TopicRepository : GenericRepository<Topic>, Itopic
+{
+    private readonly IMongoCollection<Topic> _topics;
+    private readonly IMongoCollection<Idea> _ideas;
+    private readonly IMongoCollection<Vote> _votes;
+
+
+    public TopicRepository(CisContext context) : base(context.Topics)
+    {
+        _topics = context.Topics;
+        _ideas = context.Ideas;
+        _votes = context.Votes;
+    }
 
     public override async Task<(int totalRegistros, IEnumerable<Topic> registros)> GetAllAsync(int pageIndex, int pageSize, string search)
     {
-        var query = _context.Topics as IQueryable<Topic>;
-        if (!string.IsNullOrEmpty(search))
-            query = query.Where(p => p.Title != null && p.Title.ToLower().Contains(search.ToLower()));
-        var totalRegistros = await query.CountAsync();
-        var registros = await query
-            .Include(p => p.Ideas)
-            .ThenInclude(i => i.Votes)
-            .Skip((pageIndex - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-        return (totalRegistros, registros);
+        var filter = string.IsNullOrEmpty(search)
+            ? Builders<Topic>.Filter.Empty
+            : Builders<Topic>.Filter.Regex(t => t.Title, new MongoDB.Bson.BsonRegularExpression(search, "i"));
+
+        var totalRegistros = await _topics.CountDocumentsAsync(filter);
+        var registros = await _topics.Find(filter)
+                                     .Skip((pageIndex - 1) * pageSize)
+                                     .Limit(pageSize)
+                                     .ToListAsync();
+
+       foreach (var topic in registros)
+        {
+            var ideas = await _ideas.Find(i => i.TopicId == topic.Id).ToListAsync();
+
+            foreach (var idea in ideas)
+            {
+                idea.Votes = await _votes.Find(v => v.IdeaId == idea.Id).ToListAsync();
+            }
+
+            topic.Ideas = ideas;
+        }
+
+        return ((int)totalRegistros, registros);
     }
 
+    public override async Task<Topic?> GetByIdAsync(string id)
+    {
+        var topic = await _topics.Find(t => t.Id == id).FirstOrDefaultAsync();
 
+        if (topic != null)
+        {
+            var ideas = await _ideas.Find(i => i.TopicId == topic.Id).ToListAsync();
 
-    public override async Task<Topic?> GetByIdAsync(Guid id)
-{
-    return await _context.Topics
-        .Include(p => p.Ideas)
-        .FirstOrDefaultAsync(p => p.Id == id);
-}
+            foreach (var idea in ideas)
+            {
+                idea.Votes = await _votes.Find(v => v.IdeaId == idea.Id).ToListAsync();
+            }
 
+            topic.Ideas = ideas;
+        }
+
+        return topic;
+    }
 
 }

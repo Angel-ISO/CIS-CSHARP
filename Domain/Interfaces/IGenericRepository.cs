@@ -8,7 +8,7 @@ using Domain.Entities;
 namespace Domain.Interfaces;
 public interface IGenericRepository<T> where T : BaseEntity
 {
-    Task<T?> GetByIdAsync(Guid id);
+    Task<T?> GetByIdAsync(string id);
     Task<IEnumerable<T>> GetAllAsync();
     Task<(int totalRegistros, IEnumerable<T> registros)> GetAllAsync (int pageIndex, int pageSize, string search);
     IEnumerable<T> Find(Expression<Func<T, bool>> expression);

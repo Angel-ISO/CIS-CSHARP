@@ -41,94 +41,83 @@ public class VoteController : BaseApiController
     }
 
 
-    [HttpGet("{ideaId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetByIdeaId(Guid ideaId)
-    {
-        var userId = _userContextService.GetUserId();
-        if (string.IsNullOrEmpty(userId)) return BadRequest("User ID is required.");
-
-        var vote = await _unitOfWork.Votes.GetByUserAndIdeaAsync(Guid.Parse(userId), ideaId);
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(string id)
+        {
+        var vote = await _unitOfWork.Votes.GetByIdAsync(id);
         if (vote == null)
         {
             return NotFound("Vote not found.");
         }
 
         return Ok(_mapper.Map<VoteDto>(vote));
-    }
-
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Post(CreateVoteDto createVoteDto)
-    {
-        var userId = _userContextService.GetUserId();
-        if (string.IsNullOrEmpty(userId)) return BadRequest("User ID is required.");
-
-        var existingVote = await _unitOfWork.Votes.GetByUserAndIdeaAsync(Guid.Parse(userId), createVoteDto.IdeaId);
-        if (existingVote != null)
-        {
-            return Conflict("User already voted on this idea.");
         }
 
-        var vote = new Vote
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Post(CreateVoteDto createVoteDto)
         {
-            UserId = Guid.Parse(userId),
-            IdeaId = createVoteDto.IdeaId,
-            Value = createVoteDto.Value,
-            VotedAt = DateTime.UtcNow
-        };
+            var userId = _userContextService.GetUserId(); 
+            if (string.IsNullOrEmpty(userId)) 
+                return BadRequest("User ID is required.");
+                
+             if (string.IsNullOrEmpty(createVoteDto.IdeaId))
+                 return BadRequest("Idea ID is required.");
 
-        _unitOfWork.Votes.Add(vote);
-        await _unitOfWork.SaveAsync();
+            if (!Guid.TryParse(userId, out var userGuid))
+            return BadRequest("Invalid User ID format.");
 
-        return CreatedAtAction(nameof(Post), new { vote.IdeaId, vote.UserId }, "Vote successfully registered");
-    }
+            var existingVote = await _unitOfWork.Votes.GetByUserAndIdeaAsync(userGuid, createVoteDto.IdeaId );
+            if (existingVote != null)
+            {
+                return Conflict("User already voted on this idea.");
+            }
 
-    [HttpPut("{ideaId}")]
-    [AuthorizeOwner("vote" , "ideaId")]
+            var vote = new Vote
+            {
+                UserId = userGuid,  
+                IdeaId = createVoteDto.IdeaId,
+                Value = createVoteDto.Value,
+                VotedAt = DateTime.UtcNow
+            };
+
+            _unitOfWork.Votes.Add(vote);
+            return CreatedAtAction(nameof(Post), new { vote.IdeaId, vote.UserId }, "Vote successfully registered");
+        }
+
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [AuthorizeOwner("vote")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Put(Guid ideaId, [FromBody] UpdateVoteDto updateDto)
+    public async Task<IActionResult> Put(string id, [FromBody] UpdateVoteDto updateDto)
     {
-        var userId = _userContextService.GetUserId();
-        if (string.IsNullOrEmpty(userId)) return BadRequest("User ID is required.");
-
-        var vote = await _unitOfWork.Votes.GetByUserAndIdeaAsync(Guid.Parse(userId), ideaId);
+        var vote = await _unitOfWork.Votes.GetByIdAsync(id);
         if (vote == null)
-        {
-            return NotFound("Vote not found.");
-        }
+            return NotFound("Vote not found.");        
 
         vote.Value = updateDto.Value;
         vote.VotedAt = DateTime.UtcNow;
 
         _unitOfWork.Votes.Update(vote);
-        await _unitOfWork.SaveAsync();
-
         return Ok("Vote updated.");
     }
 
     
-    [HttpDelete("{ideaId}")]
-    [AuthorizeOwner("vote", "ideaId")]
-    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [HttpDelete("{id}")]
+    [AuthorizeOwner("vote")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid ideaId)
+    public async Task<IActionResult> Delete(string id)
     {
-        var userId = _userContextService.GetUserId();
-        if (string.IsNullOrEmpty(userId)) return BadRequest("User ID is required.");
-
-        var vote = await _unitOfWork.Votes.GetByUserAndIdeaAsync(Guid.Parse(userId), ideaId);
+        var vote = await _unitOfWork.Votes.GetByIdAsync(id);
         if (vote == null)
-        {
             return NotFound("Vote not found.");
-        }
 
         _unitOfWork.Votes.Remove(vote);
-        await _unitOfWork.SaveAsync();
-
-        return NoContent();
+        return Ok("Vote deleted.");
     }
 }
