@@ -1,0 +1,11 @@
+[
+{"type":"header","version":"5.2.2","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"Cis"},
+{"type":"table","name":"Topic","database":"Cis","data":
+[
+{"Id_Topic":"08dd81d6-548f-4d9f-8978-03d349864c21","Title":"demo of presentation","Description":"balblalsldlf","Username":"angelito_374","UserId":"e208b071-d6fc-4117-abae-093dc0420864","CreatedAt":"2025-04-22 14:46:10"},
+{"Id_Topic":"11111111-1111-1111-1111-111111111111","Title":"How to implement CQRS","Description":"Discussion on implementing CQRS in a microservices architecture.","Username":"angelito_374","UserId":"e208b071-d6fc-4117-abae-093dc0420864","CreatedAt":"2025-04-17 17:23:09"},
+{"Id_Topic":"22222222-2222-2222-2222-222222222222","Title":"Best practices for clean architecture","Description":"Best practices for building clean and maintainable software architectures.","Username":"angelito_374","UserId":"e208b071-d6fc-4117-abae-093dc0420864","CreatedAt":"2025-04-17 17:23:09"}
+]
+}
+]

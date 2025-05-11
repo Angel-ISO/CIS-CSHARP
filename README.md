@@ -123,29 +123,13 @@ SetUp 💻🔌
     dotnet restore
  ```
 
-### 4. before execute u need to create the migrations:
-
- ```bash
-  dotnet ef migrations add InitialCreate --project .\Persistence\ --startup-project .\CisAPI\ --output-dir ./Data/Migrations
- ```
-    note: if u dont have dotnet ef installed, u can install it with the following command:
- ```bash
-    dotnet tool install --global dotnet-ef
- ```
-
-### 5. Execute the migrations:
-
- ```bash
-  dotnet ef database update --project .\Persistence\ --startup-project .\CisAPI\ --output-dir ./Data/Migrations
- ```
-
- ### 6. Run the project:
+ ### 4. Run the project:
 
  ```bash
     dotnet watch run --project /CisApi
 ```
 
-### 7. Open Swagger in your browser:
+### 5. Open Swagger in your browser:
 
 ```bash
 http://localhost:5202/swagger/index.html

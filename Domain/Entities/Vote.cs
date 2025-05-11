@@ -1,26 +1,28 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-
 namespace Domain.Entities;
-public class Vote : BaseEntity
+
+public class Vote: BaseEntity
 {
-        [Required]
-        [BsonRepresentation(BsonType.String)]
-        public Guid UserId { get; set; }
+    [Required]
+    [BsonRepresentation(BsonType.String)]
+    public Guid UserId { get; set; }
 
+    [Required]
+    [Range(-1, 1)]
+    public int Value { get; set; }
+    public DateTime VotedAt { get; set; } = DateTime.Now;
 
-        [Required]
-        [Range(-1, 1)]
-        public int Value { get; set; } 
+    [Required]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string? IdeaId { get; set; }
 
-        public DateTime VotedAt { get; set; } = DateTime.UtcNow;
-
-
-        [Required]
-        public string? IdeaId { get; set; }
-
-        [BsonIgnore]
-        public virtual Idea? Idea { get; set; }
+    [BsonIgnore]
+    public virtual Idea? Idea { get; set; }
 }

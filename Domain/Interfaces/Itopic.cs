@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Domain.Entities;
 
 namespace Domain.Interfaces;
-public interface Itopic: IGenericRepository<Topic>
+public interface ITopic : IGenericRepository<Topic>
 {
-    
 }

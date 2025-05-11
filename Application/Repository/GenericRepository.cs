@@ -1,14 +1,17 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Interfaces;
-using Persistence;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
-
+using Persistence;
 
 namespace Application.Repository;
-   public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
-    {
+public class GenericRepository <T> : IGenericRepository<T> where T : BaseEntity
+{
         private readonly IMongoCollection<T> _collection;
 
         public GenericRepository(IMongoCollection<T> collection)
@@ -76,4 +79,5 @@ namespace Application.Repository;
                                         .ToListAsync();
             return (totalRegistros, registros);
         }
+
 }

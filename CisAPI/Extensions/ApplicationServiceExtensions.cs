@@ -1,8 +1,19 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 using Application.UnitOfWork;
 using AspNetCoreRateLimit;
+using CisAPI.Helpers;
 using CisAPI.Services;
 using Domain.Interfaces;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Persistence;
 using Persistence.seeds;
@@ -15,11 +26,14 @@ namespace CisAPI.Extensions;
         // AutoMapper
         services.AddAutoMapper(Assembly.GetEntryAssembly());
 
+        // FluentValidation
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddFluentValidationAutoValidation();
+        services.AddFluentValidationClientsideAdapters();
 
         // Unit of Work & context-related services
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<UserContextService>();
-
         // DB Context
         string? connectionString = configuration.GetConnectionString("MongoDb");
         if (string.IsNullOrWhiteSpace(connectionString))
@@ -40,6 +54,8 @@ namespace CisAPI.Extensions;
         services.AddSingleton<VoteSeed>();
 
         services.AddHostedService<SeedOrchestrator>();
+                
+        services.AddHttpClient();
         }
         public static void ConfigureCors(this IServiceCollection services) =>
             services.AddCors(options =>

@@ -1,19 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CisAPI.Dtos.Ideas;
-public class CreateIdeaDto
+namespace CisAPI.Dtos.Ideas
 {
-    [Required]
-    [MaxLength(255)]
-    public string? Title { get; set; }
+    public class CreateIdeaDto
+    {
+        public string? TopicId { get; set; }
 
-    [Required]
-    public string? Description { get; set; }
+        public string? Title { get; set; }
 
-    [Required]
-    public string? TopicId { get; set; }
+        public string? Content { get; set; }
+    }
 }

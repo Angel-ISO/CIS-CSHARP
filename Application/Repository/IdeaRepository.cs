@@ -9,11 +9,9 @@ using MongoDB.Driver;
 using Persistence;
 
 namespace Application.Repository;
-
-
-public class IdeaRepository : GenericRepository<Idea>, Iidea
+public class IdeaRepository : GenericRepository<Idea>, IIdea
 {
-    private readonly IMongoCollection<Idea> _ideas;
+     private readonly IMongoCollection<Idea> _ideas;
     private readonly IMongoCollection<Vote> _votes;
     private readonly IMongoCollection<Topic> _topics;
 

@@ -4,14 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Domain.Interfaces;
-
 public interface IUnitOfWork
 {
-
-    Iidea Ideas { get; }
-
-    Itopic Topics { get; }
-
-    Ivote Votes { get; }
-
+    ITopic Topics {get;}
+    IIdea Ideas {get;}
+    IVote Votes {get;}
 }

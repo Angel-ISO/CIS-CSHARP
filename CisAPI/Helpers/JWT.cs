@@ -7,8 +7,9 @@ namespace CisAPI.Helpers;
 
 public class JWT
 {
-    public string? Issuer { get; set; }  
+
+    public string? Issuer { get; set; }
     public string? Key { get; set; }
     public int? DurationInMinutes { get; set; }
-    
+
 }

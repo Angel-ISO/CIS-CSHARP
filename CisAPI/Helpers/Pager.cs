@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+ 
 namespace CisAPI.Helpers;
 public class Pager<T> where T : class
 {
@@ -11,7 +10,7 @@ public class Pager<T> where T : class
     public int PageSize { get; private set; }
     public int Total { get; private set; }
     public IEnumerable<T> Registers { get; private set; }
-
+ 
     public Pager(IEnumerable<T> registers, int total, int pageIndex,
         int pageSize, string search)
     {
@@ -21,7 +20,7 @@ public class Pager<T> where T : class
         PageSize = pageSize;
         Search = search;
     }
-
+ 
     public int TotalPages
     {
         get
@@ -29,7 +28,7 @@ public class Pager<T> where T : class
             return (int)Math.Ceiling(Total / (double)PageSize);
         }
     }
-
+ 
     public bool HasPreviousPage
     {
         get
@@ -37,7 +36,7 @@ public class Pager<T> where T : class
             return (PageIndex > 1);
         }
     }
-
+ 
     public bool HasNextPage
     {
         get

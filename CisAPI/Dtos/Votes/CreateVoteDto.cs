@@ -8,10 +8,7 @@ namespace CisAPI.Dtos.Votes;
 public class CreateVoteDto
 {
 
-        [Required]
         public string? IdeaId { get; set; }
 
-        [Required]
-        [Range(-1, 1)] 
         public int Value { get; set; }
 }

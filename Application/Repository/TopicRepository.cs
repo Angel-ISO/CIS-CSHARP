@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -10,9 +6,9 @@ using Persistence;
 
 namespace Application.Repository;
 
-
-public class TopicRepository : GenericRepository<Topic>, Itopic
+public class TopicRepository : GenericRepository<Topic>, ITopic
 {
+    
     private readonly IMongoCollection<Topic> _topics;
     private readonly IMongoCollection<Idea> _ideas;
     private readonly IMongoCollection<Vote> _votes;
@@ -70,5 +66,4 @@ public class TopicRepository : GenericRepository<Topic>, Itopic
 
         return topic;
     }
-
 }

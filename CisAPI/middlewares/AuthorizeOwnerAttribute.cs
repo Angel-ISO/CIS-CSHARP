@@ -7,12 +7,13 @@ using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace CisAPI.middlewares;
+namespace CisAPI.Middlewares;
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
 public class AuthorizeOwnerAttribute : Attribute, IAsyncAuthorizationFilter
 {
-    private readonly string _routeIdName;
+
+      private readonly string _routeIdName;
     private readonly string _resourceType;
 
     public AuthorizeOwnerAttribute(string resourceType, string routeIdName = "id")
@@ -50,13 +51,11 @@ public class AuthorizeOwnerAttribute : Attribute, IAsyncAuthorizationFilter
 
         bool isOwner = false;
 
-        // Check if the user is an admin (bypassing owner check)
         if (roles != null && roles.Contains("ROLE_ADMIN"))
         {
             return;
         }
 
-        // Check ownership based on resource type
         switch (_resourceType)
         {
             case "idea":
@@ -88,5 +87,4 @@ public class AuthorizeOwnerAttribute : Attribute, IAsyncAuthorizationFilter
             };
         }
     }
-
 }

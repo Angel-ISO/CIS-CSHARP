@@ -1,24 +1,26 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using CisAPI.Dtos.Topics;
+using CisAPI.errors;
 using CisAPI.Helpers;
-using CisAPI.middlewares;
+using CisAPI.Middlewares;
 using CisAPI.Services;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CisAPI.Controllers;
- 
-
-[Authorize] 
-
-public class TopicController : BaseApiController
+namespace CisAPI.Controllers
 {
+    [Authorize]
+    public class TopicController : BaseApiController
+    {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly UserContextService _userContextService;  
-
+        private readonly UserContextService _userContextService;
 
         public TopicController(IUnitOfWork unitOfWork, IMapper mapper, UserContextService userContextService)
         {
@@ -27,17 +29,15 @@ public class TopicController : BaseApiController
             _userContextService = userContextService;
         }
 
-        
-
-    [HttpGet]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Pager<TopicDto>>> Get([FromQuery] Params @params)
-    {
-        var paginatedTopics = await _unitOfWork.Topics.GetAllAsync(@params.PageIndex, @params.PageSize, @params.Search);
-        var topicsList = _mapper.Map<List<TopicDto>>(paginatedTopics.registros);
-        return new Pager<TopicDto>(topicsList, paginatedTopics.totalRegistros, @params.PageIndex, @params.PageSize, @params.Search);
-    }
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<Pager<TopicDto>>> Get([FromQuery] Params @params)
+        {
+            var paginatedTopics = await _unitOfWork.Topics.GetAllAsync(@params.PageIndex, @params.PageSize, @params.Search);
+            var topicsList = _mapper.Map<List<TopicDto>>(paginatedTopics.registros);
+            return new Pager<TopicDto>(topicsList, paginatedTopics.totalRegistros, @params.PageIndex, @params.PageSize, @params.Search);
+        }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -52,28 +52,28 @@ public class TopicController : BaseApiController
             return Ok(_mapper.Map<TopicDto>(topic));
         }
 
-    [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public IActionResult Post(CreateTopicDto createTopicDto)
-    {
-        var userId = _userContextService.GetUserId();
-        if (string.IsNullOrEmpty(userId))
-            return BadRequest("User ID is required.");
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public IActionResult Post(CreateTopicDto createTopicDto)
+        {
+            var userId = _userContextService.GetUserId();
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest("User ID is required.");
 
-        var username = _userContextService.GetUsername();
-        var topic = _mapper.Map<Topic>(createTopicDto);
+            var username = _userContextService.GetUsername();
+            var topic = _mapper.Map<Topic>(createTopicDto);
 
-        topic.UserId = Guid.Parse(userId);
-        topic.Username = username;
+            topic.UserId = Guid.Parse(userId);
+            topic.Username = username;
 
-        _unitOfWork.Topics.Add(topic);
-        return CreatedAtAction(nameof(Get), new { id = topic.Id }, new { message = "Topic creado exitosamente" });
-    }
+            _unitOfWork.Topics.Add(topic);
+            return CreatedAtAction(nameof(Get), new { id = topic.Id }, new { message = "Topic creado exitosamente" });
+        }
 
 
 
-    [HttpPut("{id}")]
+        [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [AuthorizeOwner("topic")]
@@ -81,14 +81,14 @@ public class TopicController : BaseApiController
         public async Task<ActionResult<TopicDto>> Put(string id, [FromBody] UpdateTopicDto updateDto)
         {
             var topic = await _unitOfWork.Topics.GetByIdAsync(id);
-                if (topic == null)
-                {
-                    return NotFound();
-                }
+            if (topic == null)
+            {
+                return NotFound();
+            }
 
             if (updateDto.Title is not null)
                 topic.Title = updateDto.Title;
-                
+
             if (updateDto.Description is not null)
                 topic.Description = updateDto.Description;
 
@@ -103,13 +103,14 @@ public class TopicController : BaseApiController
         public async Task<IActionResult> Delete(string id)
         {
             var topic = await _unitOfWork.Topics.GetByIdAsync(id);
-                if (topic == null)
-                {
-                    return NotFound();
-                }
+            if (topic == null)
+            {
+                return NotFound();
+            }
 
-                _unitOfWork.Topics.Remove(topic);
-                return NoContent();
+            _unitOfWork.Topics.Remove(topic);
+            return NoContent();
         }
-}
+    }
 
+}

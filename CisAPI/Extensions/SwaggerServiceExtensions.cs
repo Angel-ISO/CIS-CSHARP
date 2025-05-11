@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.OpenApi.Models;
 
 namespace CisAPI.Extensions;
-
 public static class SwaggerServiceExtensions
 {
      public static void ConfigureSwagger(this IServiceCollection services)

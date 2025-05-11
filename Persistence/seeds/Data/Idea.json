@@ -1,0 +1,11 @@
+[
+{"type":"header","version":"5.2.2","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"Cis"},
+{"type":"table","name":"Idea","database":"Cis","data":
+[
+{"Id_Idea":"08dd81d6-832d-46d9-840c-7404656c0758","TopicId":"08dd81d6-548f-4d9f-8978-03d349864c21","Title":"yes mate???","Description":"jejrjtjtj","Username":"angelito_374","UserId":"e208b071-d6fc-4117-abae-093dc0420864","CreatedAt":"2025-04-22 19:47:28"},
+{"Id_Idea":"33333333-3333-3333-3333-333333333333","TopicId":"11111111-1111-1111-1111-111111111111","Title":"Implementing caching in CQRS","Description":"Discussing how caching can improve performance in CQRS systems.","Username":"catriel_72","UserId":"44416e81-dd00-4336-8401-e1457cd2cf9e","CreatedAt":"2025-04-17 17:23:09"},
+{"Id_Idea":"44444444-4444-4444-4444-444444444444","TopicId":"11111111-1111-1111-1111-111111111111","Title":"Domain events in CQRS","Description":"Exploring the usage of domain events in CQRS systems.","Username":"catriel_72","UserId":"44416e81-dd00-4336-8401-e1457cd2cf9e","CreatedAt":"2025-04-17 17:23:09"}
+]
+}
+]

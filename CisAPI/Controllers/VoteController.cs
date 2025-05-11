@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using CisAPI.Dtos.Votes;
 using CisAPI.Helpers;
-using CisAPI.middlewares;
+using CisAPI.Middlewares;
 using CisAPI.Services;
 using Domain.Entities;
 using Domain.Interfaces;
@@ -28,9 +28,7 @@ public class VoteController : BaseApiController
         _userContextService = userContextService;
     }
 
-
-
-    [HttpGet]
+      [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Pager<VoteDto>>> Get([FromQuery] Params @params)

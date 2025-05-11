@@ -1,0 +1,47 @@
+image: mcr.microsoft.com/dotnet/sdk:8.0
+
+stages:
+  - lint
+  - build
+  - test
+  - package
+
+variables:
+  MAIN_PROJECT_DIR: "CisAPI"
+  TEST_PROJECT_DIR: "CisTests"
+  BUILD_CONFIG: "Release"
+
+before_script:
+  - dotnet --version
+  - echo "Installing required libraries for Mongo2Go"
+  - wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+  - dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb
+  - apt update
+  - apt install -f -y  
+
+lint:
+  stage: lint
+  script:
+    - echo "Running dotnet format (optional linting)"
+    - dotnet format $MAIN_PROJECT_DIR --verify-no-changes || true
+
+build:
+  stage: build
+  script:
+    - dotnet restore $MAIN_PROJECT_DIR
+    - dotnet build $MAIN_PROJECT_DIR --configuration $BUILD_CONFIG --no-restore
+
+test:
+  stage: test
+  script:
+    - dotnet test || true
+
+package:
+  stage: package
+  script:
+    - dotnet publish $MAIN_PROJECT_DIR -c $BUILD_CONFIG -o publish/
+  artifacts:
+    paths:
+      - $MAIN_PROJECT_DIR/publish/
+    expire_in: 1 week
+

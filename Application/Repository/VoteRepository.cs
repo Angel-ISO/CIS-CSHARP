@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -10,10 +6,9 @@ using MongoDB.Driver;
 using Persistence;
 
 namespace Application.Repository;
-
-public class VoteRepository : GenericRepository<Vote>, Ivote
+public class VoteRepository : GenericRepository<Vote>, IVote
 {
-    private readonly IMongoCollection<Vote> _votes;
+   private readonly IMongoCollection<Vote> _votes;
     private readonly IMongoCollection<Idea> _ideas;
 
     public VoteRepository(CisContext context) : base(context.Votes)
@@ -71,6 +66,4 @@ public class VoteRepository : GenericRepository<Vote>, Ivote
 
             return vote;
         }
-
-
 }

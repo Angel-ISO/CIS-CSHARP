@@ -1,0 +1,11 @@
+[
+{"type":"header","version":"5.2.2","comment":"Export to JSON plugin for PHPMyAdmin"},
+{"type":"database","name":"Cis"},
+{"type":"table","name":"Vote","database":"Cis","data":
+[
+{"Id_Vote":"0886a0c7-8515-4628-920c-973860b105f6","UserId":"22d73cec-3c5d-4821-af6a-21c3fc3568ca","Value":"-1","VotedAt":"2025-04-17 17:23:09","IdeaId":"33333333-3333-3333-3333-333333333333"},
+{"Id_Vote":"08dd81d6-bbaa-4c84-8275-0e8dd3498157","UserId":"e208b071-d6fc-4117-abae-093dc0420864","Value":"1","VotedAt":"2025-04-22 19:49:03","IdeaId":"08dd81d6-832d-46d9-840c-7404656c0758"},
+{"Id_Vote":"4841610a-715e-41a6-b44d-37948d546e0f","UserId":"22d73cec-3c5d-4821-af6a-21c3fc3568ca","Value":"-1","VotedAt":"2025-04-17 17:23:09","IdeaId":"44444444-4444-4444-4444-444444444444"}
+]
+}
+]
